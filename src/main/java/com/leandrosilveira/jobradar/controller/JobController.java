@@ -1,5 +1,6 @@
 package com.leandrosilveira.jobradar.controller;
 
+import com.leandrosilveira.jobradar.dto.JobRequest;
 import com.leandrosilveira.jobradar.entity.Job;
 import com.leandrosilveira.jobradar.service.JobService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,13 @@ public class JobController {
     }
 
     @PostMapping
-    public Job createJob(@RequestBody Job job) {
+    public Job createJob(@RequestBody JobRequest request) {
+        Job job = new Job(
+                request.getTitle(),
+                request.getCompany(),
+                request.getLocation(),
+                request.getUrl()
+        );
         return jobService.save(job);
     }
 }
