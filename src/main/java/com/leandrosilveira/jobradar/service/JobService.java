@@ -22,4 +22,9 @@ public class JobService {
     public List<Job> findAll() {
         return jobRepository.findAll();
     }
+
+    public Job findById(Long id) {
+        return jobRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Job not found"));
+    }
 }

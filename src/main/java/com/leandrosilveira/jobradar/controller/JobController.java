@@ -50,4 +50,17 @@ public class JobController {
                         job.getUrl()
                 )).toList();
     }
+
+    @GetMapping("/{id}")
+    public JobResponse getJobById(@PathVariable Long id) {
+        Job job = jobService.findById(id);
+
+        return new JobResponse(
+                job.getId(),
+                job.getTitle(),
+                job.getCompany(),
+                job.getLocation(),
+                job.getUrl()
+        );
+    }
 }
