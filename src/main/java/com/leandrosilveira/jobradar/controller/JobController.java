@@ -1,12 +1,13 @@
 package com.leandrosilveira.jobradar.controller;
 
 import com.leandrosilveira.jobradar.dto.JobRequest;
+import com.leandrosilveira.jobradar.dto.JobResponse;
 import com.leandrosilveira.jobradar.entity.Job;
 import com.leandrosilveira.jobradar.service.JobService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/jobs")
@@ -19,13 +20,34 @@ public class JobController {
     }
 
     @PostMapping
-    public Job createJob(@RequestBody JobRequest request) {
+    public JobResponse createJob(@Valid @RequestBody JobRequest request) {
         Job job = new Job(
                 request.getTitle(),
                 request.getCompany(),
                 request.getLocation(),
                 request.getUrl()
         );
-        return jobService.save(job);
+        Job saved = jobService.save(job);
+
+        return new JobResponse(
+                saved.getId(),
+                saved.getTitle(),
+                saved.getCompany(),
+                saved.getLocation(),
+                saved.getUrl()
+        );
+    }
+
+    @GetMapping
+    public List<JobResponse> getAllJobs() {
+        return jobService.findAll()
+                .stream()
+                .map(job -> new JobResponse(
+                        job.getId(),
+                        job.getTitle(),
+                        job.getCompany(),
+                        job.getLocation(),
+                        job.getUrl()
+                )).toList();
     }
 }

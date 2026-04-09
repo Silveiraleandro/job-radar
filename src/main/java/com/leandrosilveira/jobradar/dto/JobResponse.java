@@ -1,16 +1,28 @@
 package com.leandrosilveira.jobradar.dto;
 
-import jakarta.validation.constraints.NotBlank;
+public class JobResponse {
 
-public class JobRequest {
-    @NotBlank
+    private Long id;
     private String title;
-    @NotBlank
     private String company;
-    @NotBlank
     private String location;
-    @NotBlank
     private String url;
+
+    public JobResponse(Long id, String title, String company, String location, String url) {
+        this.id = id;
+        this.title = title;
+        this.company = company;
+        this.location = location;
+        this.url = url;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;
