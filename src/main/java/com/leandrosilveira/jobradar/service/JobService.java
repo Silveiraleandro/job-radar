@@ -1,6 +1,7 @@
 package com.leandrosilveira.jobradar.service;
 
 import com.leandrosilveira.jobradar.entity.Job;
+import com.leandrosilveira.jobradar.exception.ResourceNotFoundException;
 import com.leandrosilveira.jobradar.repository.JobRepository;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,6 @@ public class JobService {
 
     public Job findById(Long id) {
         return jobRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Job not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Job not found with id %s", id)));
     }
 }
