@@ -28,4 +28,12 @@ public class JobService {
         return jobRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Job not found with id %s", id)));
     }
+
+    public List<Job> findByLocation(String location) {
+        return jobRepository.findByLocationIgnoreCase(location);
+    }
+
+    public List<Job> findByKeyword(String keyword) {
+        return jobRepository.findByTitleContainingIgnoreCase(keyword);
+    }
 }

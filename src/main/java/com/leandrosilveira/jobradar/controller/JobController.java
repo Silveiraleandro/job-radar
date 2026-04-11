@@ -39,9 +39,19 @@ public class JobController {
     }
 
     @GetMapping
-    public List<JobResponse> getAllJobs() {
-        return jobService.findAll()
-                .stream()
+    public List<JobResponse> getAllJobs(@RequestParam(required = false) String location,
+                                        @RequestParam(required = false) String keyword) {
+        List<Job> jobs;
+
+        if(location != null && !location.isBlank()) {
+            jobs = jobService.findByLocation(location);
+        } else if(keyword != null && !keyword.isBlank()) {
+            jobs = jobService.findByKeyword(keyword);
+        } else {
+            jobs = jobService.findAll();
+        }
+
+        return jobs.stream()
                 .map(job -> new JobResponse(
                         job.getId(),
                         job.getTitle(),

@@ -1,3 +1,4 @@
+
 package com.leandrosilveira.jobradar.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
