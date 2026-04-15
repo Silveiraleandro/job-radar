@@ -10,8 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -63,5 +63,58 @@ class JobServiceTest {
                 RuntimeException.class,
                 () -> jobService.findById(1L)
         );
+    }
+
+    @Test
+    void shouldReturnExistingJobWhenUrlAlreadyExistsTest() {
+        Job existingJob = new Job(
+                TestConstants.JAVA_DEV,
+                TestConstants.TEST_COMPANY,
+                TestConstants.VANCOUVER,
+                TestConstants.URL
+        );
+        existingJob.setId(1L);
+
+        Job newJob = new Job(
+                TestConstants.JAVA_DEV,
+                TestConstants.TEST_COMPANY,
+                TestConstants.VANCOUVER,
+                TestConstants.URL
+        );
+
+        Mockito.when(jobRepository.findByUrl(TestConstants.URL))
+                .thenReturn(Optional.of(existingJob));
+
+        Job result = jobService.save(newJob);
+
+        Assertions.assertEquals(1L, result.getId());
+        Mockito.verify(jobRepository, Mockito.never()).save(Mockito.any(Job.class));
+    }
+
+    @Test
+    void shouldSaveJobWhenUrlDoesNotExistTest() {
+        Job newJob = new Job(
+                TestConstants.JAVA_DEV,
+                TestConstants.TEST_COMPANY,
+                TestConstants.VANCOUVER,
+                TestConstants.URL
+        );
+
+        Job savedJob = new Job(
+                TestConstants.JAVA_DEV,
+                TestConstants.TEST_COMPANY,
+                TestConstants.VANCOUVER,
+                TestConstants.URL
+        );
+        savedJob.setId(1L);
+
+        Mockito.when(jobRepository.findByUrl(TestConstants.URL))
+                .thenReturn(Optional.empty());
+        Mockito.when(jobRepository.save(newJob)).thenReturn(savedJob);
+
+        Job result = jobService.save(newJob);
+
+        Assertions.assertEquals(1L, result.getId());
+        Mockito.verify(jobRepository).save(newJob);
     }
 }

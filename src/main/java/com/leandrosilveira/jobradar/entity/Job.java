@@ -13,6 +13,7 @@ public class Job {
     private String title;
     private String company;
     private String location;
+    @Column(unique = true, nullable = false)
     private String url;
 
     public Job() {}

@@ -15,5 +15,4 @@ public class JobRadarApplication {
     public static void main(String[] args) {
         SpringApplication.run(JobRadarApplication.class, args);
     }
-
 }
