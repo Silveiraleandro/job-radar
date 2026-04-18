@@ -1,5 +1,6 @@
 package com.leandrosilveira.jobradar.controller;
 
+import com.leandrosilveira.jobradar.connector.MockJobConnector;
 import com.leandrosilveira.jobradar.dto.JobRequest;
 import com.leandrosilveira.jobradar.dto.JobResponse;
 import com.leandrosilveira.jobradar.entity.Job;
@@ -14,9 +15,11 @@ import java.util.List;
 public class JobController {
 
     private final JobService jobService;
+    private final MockJobConnector mockJobConnector;
 
-    public JobController(JobService jobService) {
+    public JobController(JobService jobService, MockJobConnector mockJobConnector) {
         this.jobService = jobService;
+        this.mockJobConnector = mockJobConnector;
     }
 
     @PostMapping
@@ -72,5 +75,19 @@ public class JobController {
                 job.getLocation(),
                 job.getUrl()
         );
+    }
+
+    @PostMapping("/import")
+    public List<JobResponse> importJobs() {
+        return jobService.importJobs(mockJobConnector)
+                .stream()
+                .map(job -> new JobResponse(
+                        job.getId(),
+                        job.getTitle(),
+                        job.getCompany(),
+                        job.getLocation(),
+                        job.getUrl()
+                ))
+                .toList();
     }
 }

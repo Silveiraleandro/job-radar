@@ -1,5 +1,6 @@
 package com.leandrosilveira.jobradar.service;
 
+import com.leandrosilveira.jobradar.connector.JobConnector;
 import com.leandrosilveira.jobradar.entity.Job;
 import com.leandrosilveira.jobradar.exception.ResourceNotFoundException;
 import com.leandrosilveira.jobradar.repository.JobRepository;
@@ -48,5 +49,12 @@ public class JobService {
 
     public List<Job> findByKeyword(String keyword) {
         return jobRepository.findByTitleContainingIgnoreCase(keyword);
+    }
+
+    public List<Job> importJobs(JobConnector connector) {
+        return connector.fetchJobs()
+                .stream()
+                .map(this::save)
+                .toList();
     }
 }
