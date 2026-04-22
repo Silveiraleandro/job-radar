@@ -49,8 +49,6 @@ public class GreenhouseJobConnector implements JobConnector {
 
             GreenhouseJobsResponse greenhouseJobsResponse =
                     objectMapper.readValue(response.body(), GreenhouseJobsResponse.class);
-            LOGGER.info("Greenhouse response status: {}", response.statusCode());
-            LOGGER.info("Greenhouse response body: {}", response.body());
             LOGGER.info("Fetched {} jobs from Greenhouse", greenhouseJobsResponse.getJobs().size());
             return greenhouseJobsResponse.getJobs()
                     .stream()
@@ -69,7 +67,6 @@ public class GreenhouseJobConnector implements JobConnector {
         String location = item.getLocation() != null && item.getLocation().getName() != null
                 ? item.getLocation().getName()
                 : Constants.Greenhouse.UNKNOWN;
-        LOGGER.info("Mapping job: title={}, url={}", item.getTitle(), item.getAbsoluteUrl());
         return new Job(
                 item.getTitle(),
                 Constants.Companies.STRIPE,
