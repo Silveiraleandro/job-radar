@@ -8,5 +8,4 @@ public class TestConstants {
     public static final String ACCOUNT_EXC_AI_SALES = "Account Executive, AI Sales";
     public static final String SAN_FRAN = "San Francisco, CA";
     public static final String STRIPE_URL = "https://stripe.com/jobs/search?gh_jid=example";
-
 }

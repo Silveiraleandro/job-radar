@@ -7,8 +7,12 @@ import com.leandrosilveira.jobradar.dto.JobResponse;
 import com.leandrosilveira.jobradar.entity.Job;
 import com.leandrosilveira.jobradar.service.JobService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -108,5 +112,17 @@ public class JobController {
                         job.getUrl()
                         ))
                 .toList();
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportJobsToCsv() {
+        String csvContent = jobService.exportJobsToCsv();
+        // this tells the browser/Postman - this should be treated like a downloadable file
+        // the content is CSV
+        // sends the actual file contents
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=jobs.csv")
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .body(csvContent.getBytes(StandardCharsets.UTF_8));
     }
 }

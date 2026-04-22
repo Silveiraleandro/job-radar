@@ -57,4 +57,30 @@ public class JobService {
                 .map(this::save)
                 .toList();
     }
+
+    public String exportJobsToCsv() {
+        List<Job> jobs = jobRepository.findAll();
+
+        StringBuilder csv = new StringBuilder();
+        csv.append("id,title,company,location,url\n");
+
+        for(Job job : jobs) {
+            csv.append(job.getId()).append(",");
+            csv.append(escapeCsv(job.getTitle())).append(",");
+            csv.append(escapeCsv(job.getCompany())).append(",");
+            csv.append(escapeCsv(job.getLocation())).append(",");
+            csv.append(escapeCsv(job.getUrl())).append(",");
+        }
+
+        return csv.toString();
+    }
+
+    private String escapeCsv(String field) {
+        if(field == null) {
+            return "";
+        }
+
+        String escaped = field.replace("\"", "\"\"");
+        return "\"" + escaped + "\"";
+    }
 }

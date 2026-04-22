@@ -1,5 +1,6 @@
 package com.leandrosilveira.jobradar.service;
 
+import com.leandrosilveira.jobradar.connector.greenhouse.connector.GreenhouseJobConnector;
 import com.leandrosilveira.jobradar.entity.Job;
 import com.leandrosilveira.jobradar.repository.JobRepository;
 import commons.TestConstants;
@@ -21,6 +22,9 @@ class JobServiceTest {
 
     @InjectMocks
     private JobService jobService;
+
+    @Mock
+    private GreenhouseJobConnector gHConnector;
 
     @Test
     void shouldReturnAllJobsTest() {
@@ -116,5 +120,19 @@ class JobServiceTest {
 
         Assertions.assertEquals(1L, result.getId());
         Mockito.verify(jobRepository).save(newJob);
+    }
+
+    @Test
+    void shouldImportJobsFromConnector() {
+        Job job = new Job(TestConstants.JAVA_DEV, TestConstants.TEST_COMPANY, TestConstants.VANCOUVER, TestConstants.URL);
+
+        Mockito.when(gHConnector.fetchJobs()).thenReturn(List.of(job));
+        Mockito.when(jobRepository.findByUrl(TestConstants.URL)).thenReturn(Optional.empty());
+        Mockito.when(jobRepository.save(job)).thenReturn(job);
+
+        List<Job> result = jobService.importJobs(gHConnector);
+
+        Assertions.assertEquals(1, result.size());
+        Mockito.verify(jobRepository).save(job);
     }
 }
