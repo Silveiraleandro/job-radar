@@ -26,9 +26,9 @@ public class GreenhouseJobConnector implements JobConnector {
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
-    public GreenhouseJobConnector() {
-        this.httpClient = HttpClient.newHttpClient();
-        this.objectMapper = new ObjectMapper();
+    public GreenhouseJobConnector(HttpClient httpClient, ObjectMapper objectMapper) {
+        this.httpClient = httpClient;
+        this.objectMapper = objectMapper;
     }
 
     @Override
