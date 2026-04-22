@@ -2,59 +2,69 @@
 
 Job Radar is a backend project built with Java and Spring Boot to collect job postings from company career pages, normalize the data, store it in PostgreSQL, and expose it through a simple API.
 
-## Goals
-- Practice backend design with Java and Spring Boot
-- Build a clean and maintainable portfolio project
-- Aggregate job postings from selected sources
-- Support filtering, deduplication, and CSV export
+## 🚀 Features
 
-## Planned Stack
+- Import jobs from external sources (Greenhouse API)
+- Normalize job data into a consistent internal model
+- Deduplicate jobs based on unique URL
+- Store jobs in PostgreSQL
+- Filter jobs by keyword and location
+- REST API for accessing job data
+
+## 🛠 Tech Stack
+
 - Java
 - Spring Boot
+- Spring Data JPA (Hibernate)
 - PostgreSQL
 - Docker Compose
 - JUnit / Mockito
 
-## Status
-Project setup phase.
+## 📡 API Endpoints
+
+### Create Job
+```http
+POST /jobs
+GET /jobs
+GET /jobs/{id}
+POST /jobs/import
+POST /jobs/import/greenhouse
+
+```
+
+## Current Connector
+Greenhouse Job Board API
+Fetches real job postings from external company boards
+Maps external JSON into internal Job entities
+Handles missing fields (e.g., location fallback)
+Uses URL as a unique identifier for deduplication
 
 ## Architecture Flow
-Client (Postman / Frontend)
-→ sends HTTP request (JSON)
+Client → HTTP Request (JSON)
+→ Spring Boot (Controller Layer)
+→ DTO (JobRequest)
+→ Service Layer (business logic + deduplication)
+→ Repository (Spring Data JPA)
+→ Hibernate (ORM)
+→ PostgreSQL
 
-Spring Boot (Tomcat)
-→ receives request
-→ maps endpoint (/jobs, POST)
-→ converts JSON → JobRequest (DTO) using Jackson
-→ validates DTO (@Valid)
+Response flow:
+PostgreSQL → Hibernate → Service → Controller → DTO (JobResponse) → JSON → Client
 
-Controller
-→ receives JobRequest
-→ maps DTO → Job (Entity)
-→ calls JobService e.g JobService.save(job)
+## Import flow
+External API (Greenhouse)
+→ Connector
+→ External DTOs
+→ Job Entity
+→ Service.save() (deduplication)
+→ PostgreSQL
+→ API Response
 
-Service
-→ checks if job exists (findByUrl)
-→ if exists: log + return existing job
-→ if not: log + save job
+## Project Status
+Actively in development.
 
-Repository (Spring Data JPA)
-→ delegates to Hibernate
+Current focus:
 
-Hibernate (ORM)
-→ translates Java → SQL
-→ executes SQL in PostgreSQL
-→ maps result → Job entity (with ID)
-
-Service
-→ returns Job entity
-
-Controller
-→ maps Job → JobResponse (DTO)
-
-Spring Boot
-→ converts JobResponse → JSON (Jackson)
-→ sends HTTP response
-
-Client
-→ receives JSON response
+- improving test coverage
+- enhancing connectors
+- adding export functionality (CSV)
