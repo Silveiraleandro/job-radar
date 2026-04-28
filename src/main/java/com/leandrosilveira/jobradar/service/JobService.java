@@ -1,5 +1,6 @@
 package com.leandrosilveira.jobradar.service;
 
+import com.leandrosilveira.jobradar.common.Constants;
 import com.leandrosilveira.jobradar.connector.JobConnector;
 import com.leandrosilveira.jobradar.entity.Job;
 import com.leandrosilveira.jobradar.exception.ResourceNotFoundException;
@@ -40,7 +41,7 @@ public class JobService {
 
     public Job findById(Long id) {
         return jobRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Job not found with id %s", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(Constants.Error.JOB_NOT_FOUND, id)));
     }
 
     public List<Job> findByLocation(String location) {
@@ -69,15 +70,15 @@ public class JobService {
             csv.append(escapeCsv(job.getTitle())).append(",");
             csv.append(escapeCsv(job.getCompany())).append(",");
             csv.append(escapeCsv(job.getLocation())).append(",");
-            csv.append(escapeCsv(job.getUrl())).append(",");
+            csv.append(escapeCsv(job.getUrl())).append("\n");
         }
 
         return csv.toString();
     }
 
     private String escapeCsv(String field) {
-        if(field == null) {
-            return "";
+        if (field == null) {
+            return "\"\"";
         }
 
         String escaped = field.replace("\"", "\"\"");

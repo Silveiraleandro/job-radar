@@ -123,7 +123,7 @@ class JobServiceTest {
     }
 
     @Test
-    void shouldImportJobsFromConnector() {
+    void shouldImportJobsFromConnectorTest() {
         Job job = new Job(TestConstants.JAVA_DEV, TestConstants.TEST_COMPANY, TestConstants.VANCOUVER, TestConstants.URL);
 
         Mockito.when(gHConnector.fetchJobs()).thenReturn(List.of(job));
@@ -134,5 +134,35 @@ class JobServiceTest {
 
         Assertions.assertEquals(1, result.size());
         Mockito.verify(jobRepository).save(job);
+    }
+
+    @Test
+    void shouldExportJobsToCsvTest() {
+        Job job1 = new Job(
+                TestConstants.JAVA_DEV,
+                TestConstants.TEST_COMPANY,
+                TestConstants.VANCOUVER,
+                TestConstants.URL
+        );
+        job1.setId(1L);
+
+        Job job2 = new Job(
+                TestConstants.SPRING_BOOT_ENGINEER,
+                TestConstants.MOCK_COMPANY,
+                TestConstants.REMOTE,
+                null
+        );
+        job2.setId(2L);
+
+        Mockito.when(jobRepository.findAll()).thenReturn(List.of(job1, job2));
+
+        String csv = jobService.exportJobsToCsv();
+
+        String expected =
+                "id,title,company,location,url\n" +
+                        "1,\"Java Developer\",\"TestCompany\",\"Vancouver\",\"http://example.com\"\n" +
+                        "2,\"Spring Boot Engineer\",\"Mock Company\",\"Remote\",\"\"\n";
+
+        Assertions.assertEquals(expected, csv);
     }
 }

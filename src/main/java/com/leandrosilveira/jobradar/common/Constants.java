@@ -23,6 +23,7 @@ public class Constants {
     public static class Error {
         public static final String FILE_NOT_FOUND = "File not found: %s";
         public static final String COULD_NOT_READ_FILE = "Couldn't read file %s";
+        public static final String JOB_NOT_FOUND = "Job not found with id %s";
         public Error() {}
     }
 }
