@@ -20,10 +20,20 @@ public class Constants {
         public Companies(){}
     }
 
+    public static class JobConnector {
+        public static final String JOB_CARD = ".job-card";
+        public static final String JOB_TITLE = ".job-title";
+        public static final String COMPANY = ".company";
+        public static final String LOCATION = ".location";
+        public static final String ABS_HREF = "abs:href";
+        public JobConnector(){}
+    }
+
     public static class Error {
         public static final String FILE_NOT_FOUND = "File not found: %s";
         public static final String COULD_NOT_READ_FILE = "Couldn't read file %s";
         public static final String JOB_NOT_FOUND = "Job not found with id %s";
+        public static final String FAILED_TO_FETCH = "Failed to fetch HTML jobs";
         public Error() {}
     }
 }

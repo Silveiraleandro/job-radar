@@ -2,6 +2,7 @@ package com.leandrosilveira.jobradar.controller;
 
 import com.leandrosilveira.jobradar.connector.MockJobConnector;
 import com.leandrosilveira.jobradar.connector.greenhouse.connector.GreenhouseJobConnector;
+import com.leandrosilveira.jobradar.connector.scrap.connector.HtmlJobConnector;
 import com.leandrosilveira.jobradar.dto.JobRequest;
 import com.leandrosilveira.jobradar.dto.JobResponse;
 import com.leandrosilveira.jobradar.entity.Job;
@@ -22,12 +23,14 @@ public class JobController {
     private final JobService jobService;
     private final MockJobConnector mockJobConnector;
     private final GreenhouseJobConnector greenhouseJobConnector;
+    private final HtmlJobConnector htmlJobConnector;
 
     public JobController(JobService jobService, MockJobConnector mockJobConnector,
-                         GreenhouseJobConnector greenhouseJobConnector) {
+                         GreenhouseJobConnector greenhouseJobConnector, HtmlJobConnector htmlJobConnector) {
         this.jobService = jobService;
         this.mockJobConnector = mockJobConnector;
         this.greenhouseJobConnector = greenhouseJobConnector;
+        this.htmlJobConnector = htmlJobConnector;
     }
 
     // Flow: Client → DTO → Controller → Service → Repository → Hibernate → DB → Response DTO → Client
@@ -41,13 +44,7 @@ public class JobController {
         );
         Job saved = jobService.save(job);
 
-        return new JobResponse(
-                saved.getId(),
-                saved.getTitle(),
-                saved.getCompany(),
-                saved.getLocation(),
-                saved.getUrl()
-        );
+        return toResponse(saved);
     }
 
     @GetMapping
@@ -64,39 +61,22 @@ public class JobController {
         }
 
         return jobs.stream()
-                .map(job -> new JobResponse(
-                        job.getId(),
-                        job.getTitle(),
-                        job.getCompany(),
-                        job.getLocation(),
-                        job.getUrl()
-                )).toList();
+                .map(this::toResponse)
+                .toList();
     }
 
     @GetMapping("/{id}")
     public JobResponse getJobById(@PathVariable Long id) {
         Job job = jobService.findById(id);
 
-        return new JobResponse(
-                job.getId(),
-                job.getTitle(),
-                job.getCompany(),
-                job.getLocation(),
-                job.getUrl()
-        );
+        return toResponse(job);
     }
 
     @PostMapping("/import")
     public List<JobResponse> importJobs() {
         return jobService.importJobs(mockJobConnector)
                 .stream()
-                .map(job -> new JobResponse(
-                        job.getId(),
-                        job.getTitle(),
-                        job.getCompany(),
-                        job.getLocation(),
-                        job.getUrl()
-                ))
+                .map(this::toResponse)
                 .toList();
     }
 
@@ -104,13 +84,7 @@ public class JobController {
     public List<JobResponse> importGreenhouseJobs() {
         return jobService.importJobs(greenhouseJobConnector)
                 .stream()
-                .map(job -> new JobResponse(
-                        job.getId(),
-                        job.getTitle(),
-                        job.getCompany(),
-                        job.getLocation(),
-                        job.getUrl()
-                        ))
+                .map(this::toResponse)
                 .toList();
     }
 
@@ -124,5 +98,23 @@ public class JobController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=jobs.csv")
                 .contentType(MediaType.parseMediaType("text/csv"))
                 .body(csvContent.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @PostMapping("/import/html")
+    public List<JobResponse> importScrapedJobs() {
+        return jobService.importJobs(htmlJobConnector)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    private JobResponse toResponse(Job job) {
+        return new JobResponse(
+                job.getId(),
+                job.getTitle(),
+                job.getCompany(),
+                job.getLocation(),
+                job.getUrl()
+        );
     }
 }

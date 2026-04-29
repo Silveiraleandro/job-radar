@@ -1,36 +1,47 @@
 # Job Radar
 
-Job Radar is a backend project built with Java and Spring Boot to collect job postings from company career pages, normalize the data, store it in PostgreSQL, and expose it through a simple API.
+Job Radar is a backend project built with Java and Spring Boot to collect job postings from company career pages, 
+normalize the data, store it in PostgreSQL, and expose it through a simple API.
 
-## 🚀 Features
+## Features
 
-- Import jobs from external sources (Greenhouse API)
-- Normalize job data into a consistent internal model
-- Deduplicate jobs based on unique URL
-- Store jobs in PostgreSQL
-- Filter jobs by keyword and location
-- REST API for accessing job data
+- Create and retrieve job postings through a REST API
+- Import jobs from a mock connector
+- Import real jobs from the Greenhouse Job Board API
+- Import jobs from an HTML scraping connector using Jsoup
+- Normalize all sources into a common Job model
+- Deduplicate jobs by URL
+- Filter jobs by location or keyword
+- Export saved jobs as a downloadable CSV file
+- Unit tests for services and connectors
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - Java
 - Spring Boot
-- Spring Data JPA (Hibernate)
+- Spring Data JPA / Hibernate
 - PostgreSQL
 - Docker Compose
-- JUnit / Mockito
+- Jsoup
+- JUnit 5
+- Mockito
 
-## 📡 API Endpoints
+---
 
-### Create Job
-```http
-POST /jobs
-GET /jobs
-GET /jobs/{id}
-POST /jobs/import
-POST /jobs/import/greenhouse
+## API Endpoints
 
-```
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/jobs` | Create a job manually |
+| GET | `/jobs` | Get all jobs |
+| GET | `/jobs?location=Vancouver` | Filter jobs by location |
+| GET | `/jobs?keyword=java` | Filter jobs by keyword |
+| GET | `/jobs/{id}` | Get a job by ID |
+| POST | `/jobs/import` | Import jobs from mock connector |
+| POST | `/jobs/import/greenhouse` | Import jobs from Greenhouse API |
+| POST | `/jobs/import/html` | Import jobs from HTML scraping connector |
+| GET | `/jobs/export` | Download jobs as CSV |
+
 
 ## Current Connector
 Greenhouse Job Board API
@@ -52,19 +63,31 @@ Response flow:
 PostgreSQL → Hibernate → Service → Controller → DTO (JobResponse) → JSON → Client
 
 ## Import flow
-External API (Greenhouse)
-→ Connector
+→ Connector (API / HTML / Mock)
 → External DTOs
 → Job Entity
-→ Service.save() (deduplication)
+→ JobService.importJobs()
+→ Deduplication by URL
 → PostgreSQL
 → API Response
 
+## Running locally
+→ Start PostgreSQL
+docker compose up -d
+→ Run the application
+./mvnw spring-boot:run
+
 ## Project Status
-Actively in development.
+MVP completed with multiple connectors, CSV export, and unit test coverage.
 
-Current focus:
+Next Improvements
+Live production scraping source
+Pagination
+Combined filtering
+Additional connectors
+CI/CD pipeline
+Swagger / OpenAPI docs
 
-- improving test coverage
-- enhancing connectors
-- adding export functionality (CSV)
+### Export Jobs to CSV
+```http
+GET /jobs/export
