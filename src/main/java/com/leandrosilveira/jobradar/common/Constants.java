@@ -17,16 +17,19 @@ public class Constants {
 
     public static class Companies {
         public static final String STRIPE = "Stripe";
+        public static final String PROPER = "Proper";
         public Companies(){}
     }
 
-    public static class JobConnector {
-        public static final String JOB_CARD = ".job-card";
-        public static final String JOB_TITLE = ".job-title";
-        public static final String COMPANY = ".company";
-        public static final String LOCATION = ".location";
+    public static class Html {
+        public static final String POSTING = ".posting";
+        public static final String POSTING_TITLE_H5 = ".posting-title h5";
+        public static final String H5 = "h5";
+        public static final String POSTING_TITLE = ".posting-title";
+        public static final String SORT_BY_LOCATION = ".sort-by-location";
         public static final String ABS_HREF = "abs:href";
-        public JobConnector(){}
+        public static final String USER_AGENT = "Mozilla/5.0";
+        public Html(){}
     }
 
     public static class Error {
