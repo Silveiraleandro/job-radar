@@ -12,4 +12,6 @@ public class TestConstants {
     public static final String SPRING_BOOT_ENGINEER = "Spring Boot Engineer";
     public static final String MOCK_COMPANY = "Mock Company";
     public static final String REMOTE = "Remote";
+    public static final String CANADA = "Canada";
+    public static final String ENGINEER = "Engineer";
 }

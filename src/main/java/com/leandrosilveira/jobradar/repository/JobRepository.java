@@ -1,6 +1,8 @@
 package com.leandrosilveira.jobradar.repository;
 
 import com.leandrosilveira.jobradar.entity.Job;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -13,4 +15,14 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     List<Job> findByTitleContainingIgnoreCase(String keyword);
 
     Optional<Job> findByUrl(String url);
+
+    Page<Job> findByLocationIgnoreCase(String location, Pageable pageable);
+
+    Page<Job> findByTitleContainingIgnoreCase(String keyword, Pageable pageable);
+
+    Page<Job> findByLocationIgnoreCaseAndTitleContainingIgnoreCase(
+            String location,
+            String keyword,
+            Pageable pageable
+    );
 }

@@ -8,6 +8,9 @@ import com.leandrosilveira.jobradar.dto.JobResponse;
 import com.leandrosilveira.jobradar.entity.Job;
 import com.leandrosilveira.jobradar.service.JobService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -48,17 +51,15 @@ public class JobController {
     }
 
     @GetMapping
-    public List<JobResponse> getAllJobs(@RequestParam(required = false) String location,
-                                        @RequestParam(required = false) String keyword) {
-        List<Job> jobs;
+    public List<JobResponse> getAllJobs(
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
 
-        if(location != null && !location.isBlank()) {
-            jobs = jobService.findByLocation(location);
-        } else if(keyword != null && !keyword.isBlank()) {
-            jobs = jobService.findByKeyword(keyword);
-        } else {
-            jobs = jobService.findAll();
-        }
+        Page<Job> jobs = jobService.findJobs(location, keyword, pageable);
 
         return jobs.stream()
                 .map(this::toResponse)

@@ -11,6 +11,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -160,9 +165,101 @@ class JobServiceTest {
 
         String expected =
                 "id,title,company,location,url\n" +
-                        "1,\"Java Developer\",\"TestCompany\",\"Vancouver\",\"http://example.com\"\n" +
+                        "1,\"Java Developer\",\"TestCompany\",\"Vancouver\",\"https://example.com\"\n" +
                         "2,\"Spring Boot Engineer\",\"Mock Company\",\"Remote\",\"\"\n";
 
         Assertions.assertEquals(expected, csv);
+    }
+
+    @Test
+    void shouldFindJobsByLocationAndKeywordTest() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Job> jobs = new PageImpl<>(List.of());
+
+        Mockito.when(jobRepository.findByLocationIgnoreCaseAndTitleContainingIgnoreCase(
+                TestConstants.CANADA,
+                TestConstants.ENGINEER,
+                pageable
+        )).thenReturn(jobs);
+
+        Page<Job> result = jobService.findJobs(
+                TestConstants.CANADA,
+                TestConstants.ENGINEER,
+                pageable
+        );
+
+        Assertions.assertEquals(0, result.getContent().size());
+
+        Mockito.verify(jobRepository).findByLocationIgnoreCaseAndTitleContainingIgnoreCase(
+                TestConstants.CANADA,
+                TestConstants.ENGINEER,
+                pageable
+        );
+    }
+
+    @Test
+    void shouldFindJobsByLocationOnlyTest() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Job> jobs = new PageImpl<>(List.of());
+
+        Mockito.when(jobRepository.findByLocationIgnoreCase(
+                TestConstants.CANADA,
+                pageable
+        )).thenReturn(jobs);
+
+        Page<Job> result = jobService.findJobs(
+                TestConstants.CANADA,
+                null,
+                pageable
+        );
+
+        Assertions.assertEquals(0, result.getContent().size());
+
+        Mockito.verify(jobRepository).findByLocationIgnoreCase(
+                TestConstants.CANADA,
+                pageable
+        );
+    }
+
+    @Test
+    void shouldFindJobsByKeywordOnlyTest() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Job> jobs = new PageImpl<>(List.of());
+
+        Mockito.when(jobRepository.findByTitleContainingIgnoreCase(
+                TestConstants.ENGINEER,
+                pageable
+        )).thenReturn(jobs);
+
+        Page<Job> result = jobService.findJobs(
+                null,
+                TestConstants.ENGINEER,
+                pageable
+        );
+
+        Assertions.assertEquals(0, result.getContent().size());
+
+        Mockito.verify(jobRepository).findByTitleContainingIgnoreCase(
+                TestConstants.ENGINEER,
+                pageable
+        );
+    }
+
+    @Test
+    void shouldFindAllJobsWhenNoFiltersProvidedTest() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Job> jobs = new PageImpl<>(List.of());
+
+        Mockito.when(jobRepository.findAll(pageable)).thenReturn(jobs);
+
+        Page<Job> result = jobService.findJobs(
+                null,
+                null,
+                pageable
+        );
+
+        Assertions.assertEquals(0, result.getContent().size());
+
+        Mockito.verify(jobRepository).findAll(pageable);
     }
 }

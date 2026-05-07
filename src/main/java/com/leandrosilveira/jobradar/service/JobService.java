@@ -5,6 +5,8 @@ import com.leandrosilveira.jobradar.connector.JobConnector;
 import com.leandrosilveira.jobradar.entity.Job;
 import com.leandrosilveira.jobradar.exception.ResourceNotFoundException;
 import com.leandrosilveira.jobradar.repository.JobRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import org.slf4j.LoggerFactory;
@@ -74,6 +76,28 @@ public class JobService {
         }
 
         return csv.toString();
+    }
+
+    public Page<Job> findJobs(String location, String keyword, Pageable pageable) {
+        boolean hasLocation = location != null && !location.isBlank();
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
+
+        if(hasLocation && hasKeyword) {
+            return jobRepository.findByLocationIgnoreCaseAndTitleContainingIgnoreCase(
+                    location,
+                    keyword,
+                    pageable
+            );
+        }
+        if(hasLocation) {
+            return jobRepository.findByLocationIgnoreCase(location, pageable);
+        }
+
+        if(hasKeyword) {
+            return jobRepository.findByTitleContainingIgnoreCase(keyword, pageable);
+        }
+
+        return jobRepository.findAll(pageable);
     }
 
     private String escapeCsv(String field) {
