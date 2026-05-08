@@ -11,7 +11,8 @@ normalize the data, store it in PostgreSQL, and expose it through a simple API.
 - Import jobs from an HTML scraping connector using Jsoup
 - Normalize all sources into a common Job model
 - Deduplicate jobs by URL
-- Filter jobs by location or keyword
+- Filter jobs by location and/or keyword
+- Pagination support for large result sets
 - Export saved jobs as a downloadable CSV file
 - Unit tests for services and connectors
 
@@ -41,30 +42,50 @@ normalize the data, store it in PostgreSQL, and expose it through a simple API.
 | POST | `/jobs/import/greenhouse` | Import jobs from Greenhouse API |
 | POST | `/jobs/import/html` | Import jobs from HTML scraping connector |
 | GET | `/jobs/export` | Download jobs as CSV |
+| GET | `/jobs?page=0&size=20` | Get paginated jobs |
+| GET | `/jobs?location=Canada&keyword=Engineer&page=0&size=10` | Combined filtering with pagination |
 
 
-## Current Connector
-Greenhouse Job Board API
-Fetches real job postings from external company boards
-Maps external JSON into internal Job entities
-Handles missing fields (e.g., location fallback)
-Uses URL as a unique identifier for deduplication
+## Connectors
+
+## Connectors
+
+### Mock Connector
+Used for local testing and predictable demo data.
+
+### Greenhouse API Connector
+- Fetches real job postings from Greenhouse job boards
+- Maps external JSON into internal Job entities
+- Handles missing fields (e.g., location fallback)
+
+### HTML Scraping Connector
+- Uses Jsoup to scrape live Lever-hosted job boards
+- Extracts titles, locations, and URLs from HTML
+- Uses CSS selectors for parsing
 
 ## Architecture Flow
-Client → HTTP Request (JSON)
-→ Spring Boot (Controller Layer)
-→ DTO (JobRequest)
-→ Service Layer (business logic + deduplication)
-→ Repository (Spring Data JPA)
-→ Hibernate (ORM)
+
+Client
+→ HTTP Request
+→ Spring MVC Controller
+→ DTO Mapping / Validation
+→ Service Layer
+→ Repository Layer
+→ Hibernate / JPA
 → PostgreSQL
 
-Response flow:
-PostgreSQL → Hibernate → Service → Controller → DTO (JobResponse) → JSON → Client
+Response:
+PostgreSQL
+→ Hibernate
+→ Service
+→ Controller
+→ Response DTO
+→ JSON Response
+→ Client
 
 ## Import flow
 → Connector (API / HTML / Mock)
-→ External DTOs
+→ External Source Mapping 
 → Job Entity
 → JobService.importJobs()
 → Deduplication by URL
@@ -72,22 +93,45 @@ PostgreSQL → Hibernate → Service → Controller → DTO (JobResponse) → JS
 → API Response
 
 ## Running locally
-→ Start PostgreSQL
+
+### Start PostgreSQL
+
+```bash
 docker compose up -d
-→ Run the application
+
 ./mvnw spring-boot:run
+```
 
 ## Project Status
-MVP completed with multiple connectors, CSV export, and unit test coverage.
 
-Next Improvements
-Live production scraping source
-Pagination
-Combined filtering
-Additional connectors
-CI/CD pipeline
-Swagger / OpenAPI docs
+Current MVP includes:
+
+- REST API with layered Spring Boot architecture
+- PostgreSQL persistence with JPA/Hibernate
+- DTO validation and entity mapping
+- URL-based deduplication
+- Pagination and combined filtering
+- CSV export support
+- Multiple job ingestion connectors
+- Real Greenhouse API integration
+- Live HTML scraping using Jsoup
+- Unit tests with JUnit and Mockito
+- Externalized YAML configuration
+
+The application now functions as a multi-source job aggregation backend platform.
+
+## Future Improvements
+
+- Swagger / OpenAPI documentation
+- Scheduled job imports
+- Additional connectors
+- CI/CD pipeline
+- Frontend dashboard
 
 ### Export Jobs to CSV
+
 ```http
 GET /jobs/export
+```
+
+Returns a downloadable CSV file containing all stored jobs.
